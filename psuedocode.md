@@ -1,16 +1,64 @@
-Skip through lines in Samfile starting with "@"
-
-create fwd_strand dictionary
-create rev_strand dictionary
+## Python
 
 **def soft_clip_adjust (samfile_line):**
 > *'''read samfile line and adjusts start position if CIGAR string indicates softclipping'''* \
   (the changes are in bold) \
-  **input:**  NS500451:154:HWKTMBGXX:1:11101:24260:1121:CTGTTCAC	0	2	**76814284**	36	**2S71M**	*	0	0	<sequence>	MD:Z:71	NH:i:1	HI:i:1	NM:i:0	SM:i:36	XQ:i:40	X2:i:0	XO:Z:UU \
-  **output:** NS500451:154:HWKTMBGXX:1:11101:24260:1121:CTGTTCAC	0	2	**7681428288**	36	**71M**	*	0	0	<sequence>	MD:Z:71	NH:i:1	HI:i:1	NM:i:0	SM:i:36	XQ:i:40	X2:i:0	XO:Z:UU 
+  *note that this function does not change the CIGAR string \
+  **input:**  NS500451:154:HWKTMBGXX:1:11101:24260:1121:CTGTTCAC	0	2	**100**	36	2S71M	*	0	0	<sequence>	MD:Z:71	NH:i:1	HI:i:1	NM:i:0	SM:i:36	XQ:i:40	X2:i:0	XO:Z:UU \
+  **output:** NS500451:154:HWKTMBGXX:1:11101:24260:1121:CTGTTCAC	0	2	**98**	36	2S71M	*	0	0	<sequence>	MD:Z:71	NH:i:1	HI:i:1	NM:i:0	SM:i:36	XQ:i:40	X2:i:0	XO:Z:UU \
+  **OUT: soft_corrected_samfile_line**
 
-**def
   
   
-Main_loop:
-  `Reads samfile line by line, and for each line it does the following:`
+**def modify_sam_file (original_samfile):**
+> *'''modifies the start position of everyline in a samfile'''* \
+  *read through original samfile and for each line, do **soft_clip_adjust** (ignores lines starting with "@") \
+  then determine if the line is reverse compliment \
+  **input:** original samfile \
+  **output:** two output files: \
+  (1) samfile with adjusted start positions all of which are forward strand \
+  (2) samfile with adjusted start positions all of which are reverse compliment
+  
+modify_sam_file(original_samfile)
+  
+## Bash
+  
+Then, exit python and go to bash: \
+  ```sort in-place modified_samfile by chromosome then position then UMI``` 
+  
+  ```sort in-place modified_samfile_rev_comp by chromosome then position then UMI```
+
+## Python
+then back into python:
+  
+**def deduper (modified_samfile, modified_samfile_revcomp):**
+> *''' removes PCR duplicates '''* \
+  read first line of modified_samfile and modified_samfile_rev_comp \
+  **line** = samfile line \
+  **line_revcomp** = revcomp samfile line \
+  \
+  **chromosome** = column 3 of samfile line \
+  **chromosome_revcomp** = column 3 of revcomp samfile \
+  \
+  **position** = column 4 of samfile line \
+  **position_revcomp** = column 4 of revcomp line \
+  \
+  **umi** = last part of column 1 \
+  **umi_revcomp** = last part of revcomp column 1 \
+  \
+  then look at next line in samfile and revcomp samfile: \
+  **if** chromosomes, position, umi, and strandedness match, then read the next line. (do this for revcomp as well) \
+  **if** chromosomes, position, umi, and strandedness **do not** match, then print **line** to output file. (do this for revcomp as well) \
+  \
+  **input:** modified_samfile, modifed_samfile_revcomp \
+  **output:** modified_deduped_samfile
+
+deduper (modified_samfile, modified_samfile_revcomp) 
+
+**def fix_soft_adjust (modified_deduped_samfile):** 
+> *''' readjusts samfile lines to match *original unchange cigar strings* '''* \
+  for each line in samfile: read CIGAR string and adjust position back to *original* position. \
+  **input:** modified_deduped_samfile \
+  **output:** deduped_samfile
+  
+fix_soft_adjust(modified_deduped_samfile)
