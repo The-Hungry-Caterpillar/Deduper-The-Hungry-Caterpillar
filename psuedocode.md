@@ -47,8 +47,8 @@ then back into python:
   **umi_revcomp** = last part of revcomp column 1 \
   \
   then look at next line in samfile and revcomp samfile: \
-  **if** chromosomes, position, umi, and strandedness match, then read the next line. (do this for revcomp as well) \
-  **if** chromosomes, position, umi, and strandedness **do not** match, then print **line** to output file. (do this for revcomp as well) \
+  **if** chromosomes, position, and umi match, then read the next line. (do this for revcomp as well) \
+  **if** chromosomes, position, and umi **do not** match, then print **line** to output file. (do this for revcomp as well) \
   \
   **input:** modified_samfile, modifed_samfile_revcomp \
   **output:** modified_deduped_samfile
