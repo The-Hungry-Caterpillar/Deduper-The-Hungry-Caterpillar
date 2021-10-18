@@ -70,20 +70,26 @@ fix_soft_adjust(modified_deduped_samfile)\
 \
 \
 Or, I might go by method of:
-  1. for each line:\
-    - check if feasible UMI\
-    - fix the soft clipping \
-    - Look up corrected position (position will be keys of a dictionary)
-      - if not in position dictionary: add it to position dictionary and restart loop at (1)
-      - if in position dictionary: continue to next step
-    - Look up strand (strand will be a nested dictionary as the value of each position key from the position dictionary)
-      - if not in strand dictionary: add it to strand dictionary and restart loop at (1)
-      - if in strand dictionary: continue to next step
-    - Look up chromosome (chromosome will be a nested dictionary as the value of each strand key from the strand dictionary)
-      - if not in chromosome dictionary: add it to chromosome dictionary and restart loop at (1)
-      - if in chromosome dictionary: continue to next step
-    - Look up UMI (UMI will be a nested dictionary as the value of each chromosom key from the chromosom dictionary)
-      - if not in UMI dictionary: add it to UMI dictionary and restart loop at (1)
-      - if in UMI dictionary: dicard read -- it is a PCR duplicate
+  
+### for each line:
+  a. check if feasible UMI
+  
+  b. fix the soft clipping 
+  
+  c. Look up corrected position (position will be keys of a dictionary)\
+     - if not in position dictionary: add it to position dictionary and restart loop at (1)\
+     - if in position dictionary: continue to next step
+  
+  d. Look up strand (strand will be a nested dictionary as the value of each position key from the position dictionary)\
+    - if not in strand dictionary: add it to strand dictionary and restart loop at (1)\
+    - if in strand dictionary: continue to next step
+ 
+  e. Look up chromosome (chromosome will be a nested dictionary as the value of each strand key from the strand dictionary)\
+    - if not in chromosome dictionary: add it to chromosome dictionary and restart loop at (1)\
+    - if in chromosome dictionary: continue to next step
+  
+  f. Look up UMI (UMI will be a nested dictionary as the value of each chromosom key from the chromosom dictionary)\
+    - if not in UMI dictionary: add it to UMI dictionary and restart loop at (1)\
+    - if in UMI dictionary: dicard read -- it is a PCR duplicate
   
 The nested dictionary scheme is like a tree, so you only need to look as deep to remove abiguity, and since dictionaries are ***extremely*** fast I think this will work well. 
