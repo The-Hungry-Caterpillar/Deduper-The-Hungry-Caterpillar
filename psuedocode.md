@@ -91,7 +91,6 @@ fix_soft_adjust(modified_deduped_samfile)\
   f. Look up UMI (UMI will be a nested dictionary as the value of each chromosom key from the chromosom dictionary)\
     - if not in UMI dictionary: add it to UMI dictionary, write line to out file, and restart loop at (1)\
     - if in UMI dictionary: dicard read -- it is a PCR duplicate
+
   
-  g. if everything
-  
-The nested dictionary scheme is like a tree, so you only need to look as deep to remove abiguity, and since dictionaries are ***extremely*** fast I think this will work well. 
+The nested dictionary scheme is like a tree, so you only need to look as deep as to remove abiguity, and since dictionaries are ***extremely*** fast I think this will work well. 
