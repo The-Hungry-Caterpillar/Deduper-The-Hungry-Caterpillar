@@ -76,7 +76,7 @@ fix_soft_adjust(modified_deduped_samfile)\
   
   b. fix the soft clipping 
   
-  c. Look up corrected position (position will be keys of a dictionary)\
+  c. Look up corrected position in position_dictionary (position will be keys of a dictionary)\
      - if not in position dictionary: add it to position dictionary, write line to out file, and restart loop at (1)\
      - if in position dictionary: continue to next step
   
