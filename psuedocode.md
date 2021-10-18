@@ -1,3 +1,37 @@
+## Edit: I'm leaning more toward the method of:
+  
+### for each line:
+  a. read and hold the line as a variable. check if feasible UMI, if not then discard line.
+  
+  b. fix the soft clipping 
+  
+  c. Look up corrected position in position_dictionary (position will be keys of a dictionary)\
+     - if not in position dictionary: add it to position dictionary, write line to out file, and restart loop at (1)\
+     - if in position dictionary: continue to next step
+  
+  d. Look up strand (strand will be a nested dictionary as the value of each position key from the position dictionary)\
+    - if not in strand dictionary: add it to strand dictionary, write line to out file, and restart loop at (1)\
+    - if in strand dictionary: continue to next step
+ 
+  e. Look up chromosome (chromosome will be a nested dictionary as the value of each strand key from the strand dictionary)\
+    - if not in chromosome dictionary: add it to chromosome dictionary, write line to out file, and restart loop at (1)\
+    - if in chromosome dictionary: continue to next step
+  
+  f. Look up UMI (UMI will be a nested dictionary as the value of each chromosom key from the chromosom dictionary)\
+    - if not in UMI dictionary: add it to UMI dictionary, write line to out file, and restart loop at (1)\
+    - if in UMI dictionary: dicard read -- it is a PCR duplicate
+
+  
+The nested dictionary scheme is like a tree, so you only need to look as deep as to remove abiguity, and since dictionaries are ***extremely*** fast I think this will work well. 
+\
+\
+\
+\
+\
+\
+
+
+
 ## Python
 
 **def soft_clip_adjust (samfile_line):**
@@ -69,28 +103,3 @@ fix_soft_adjust(modified_deduped_samfile)\
 \
 \
 \
-## Edit: I'm leaning more toward the method of:
-  
-### for each line:
-  a. read and hold the line as a variable. check if feasible UMI, if not then discard line.
-  
-  b. fix the soft clipping 
-  
-  c. Look up corrected position in position_dictionary (position will be keys of a dictionary)\
-     - if not in position dictionary: add it to position dictionary, write line to out file, and restart loop at (1)\
-     - if in position dictionary: continue to next step
-  
-  d. Look up strand (strand will be a nested dictionary as the value of each position key from the position dictionary)\
-    - if not in strand dictionary: add it to strand dictionary, write line to out file, and restart loop at (1)\
-    - if in strand dictionary: continue to next step
- 
-  e. Look up chromosome (chromosome will be a nested dictionary as the value of each strand key from the strand dictionary)\
-    - if not in chromosome dictionary: add it to chromosome dictionary, write line to out file, and restart loop at (1)\
-    - if in chromosome dictionary: continue to next step
-  
-  f. Look up UMI (UMI will be a nested dictionary as the value of each chromosom key from the chromosom dictionary)\
-    - if not in UMI dictionary: add it to UMI dictionary, write line to out file, and restart loop at (1)\
-    - if in UMI dictionary: dicard read -- it is a PCR duplicate
-
-  
-The nested dictionary scheme is like a tree, so you only need to look as deep as to remove abiguity, and since dictionaries are ***extremely*** fast I think this will work well. 
