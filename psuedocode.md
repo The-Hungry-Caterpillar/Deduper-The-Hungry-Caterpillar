@@ -69,7 +69,7 @@ fix_soft_adjust(modified_deduped_samfile)\
 \
 \
 \
-Or, I might go by method of:
+## Edit: I'm leaning more toward the method of:
   
 ### for each line:
   a. check if feasible UMI
