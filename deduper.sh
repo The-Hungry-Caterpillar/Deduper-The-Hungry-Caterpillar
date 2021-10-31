@@ -50,7 +50,7 @@ if ! [ -f "$file" ]; then
 fi
 
 
-if [ -n $sort ]; then
+if [ $sort ]; then
     module load samtools/1.5
     samtools view -S -b $file > inter.bam
     rm $file
@@ -58,3 +58,4 @@ if [ -n $sort ]; then
     samtools view sorted.bam > $file
 fi
 
+python dedup.py -f $file
