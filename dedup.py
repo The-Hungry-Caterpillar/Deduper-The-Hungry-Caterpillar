@@ -1,37 +1,46 @@
 import re
 
-test_mode=True
-def get_args(): #defines all the independent variables
-	import argparse
-	parser = argparse.ArgumentParser(description = "still need description")
+test_mode=False
+def get_args():
+    import argparse
+    parser = argparse.ArgumentParser(description = "still need description")
 	#parser.add_argument('- command line variable', '-- python variable', description)
-	parser.add_argument('-f', '--file', help='sam filename to be deduped')
-	
-	return parser.parse_args()
-
+    parser.add_argument('-f', '--file', help='sam filename to be deduped')
+    parser.add_argument('-o', '--out', help='name of deduped output file')
+    parser.add_argument('-u', '--umi', help='name of umi file')
+    return parser.parse_args()
 args=get_args()
 
-def UMI(line):
+def UMI_builder(umi_file,umi_dict): #input UMI file and empty UMI dictionary: no output, appends to empty dictionary
+    '''takes umi file and empty umi dictionary as input, note that the umi file MUST contain only UMI sequences separated by new lines'''
+    u=open(umi_file, 'r')
+    while True:
+        umi=u.readline().strip()
+        if umi == '':
+            break
+        umi_dict[umi]=''
+    u.close()
+
+def UMI(line): #input sam line: output UMI of read (assumes UMI is last value in QNAME)
     '''finds the UMI in the zeroeth column of SAM line'''
-    UMI=line[0].split(':')[7]
+    UMI=line[0].split(':')[-1]
     return(UMI)
 
-def chrom(line):
+def chrom(line): #input sam line: output chromosome of read
     '''finds the chromosome number in second column of SAM line'''
     chrom=line[2]
     return(chrom)
 
-def ref_position(line):
+def ref_position(line): #input sam line: output left-most start position
     '''finds the leftmost reference-based position of read in SAM line'''
     ref_position=line[3]
     return(ref_position)
 
-def is_rev_strand(line):
+def is_rev_strand(line): #input sam line: output True if rev strand else False
     flag=int(line[1])
-    if ((flag & 16) == 16):
-        return True
+    return True if ((flag & 16) == 16) else False
 
-def adjusted_position(line):
+def adjusted_position(line): #input sam line: output adjusted start position -- strand specific
     '''uses cigar string to adjust the starting position
     if the strand is reverse then we use cigar string to find right-most adjusted position
     if the strand is forward then we use cigar string to find left-most adjusted position'''
@@ -85,28 +94,70 @@ def adjusted_position(line):
     
     if test_mode:
         print('adjusted position is {}'.format(adjusted_position))
+    
     return adjusted_position
 
-
 f=open(args.file, 'r')
-line=f.readline().strip().split('\t')
+w=open(args.out, 'w')
 
-adjusted_position(line)
-# UMI=UMI(line)
-# chrom=chrom(line)
-# ref=ref_position(line)
+umi_dict={}
+if args.umi != 'NULL':
+    UMI_builder(args.umi, umi_dict)
+bad_UMI_count=0
+duplicate_count=0
+total_count=0
 
-# cigar=line[5]
-# cigar_num=re.split("[A-Z]",cigar)
-# cigar_letters=(re.split("[0-9]+",cigar))
-# del cigar_letters[0]
+current_dict={}
 
-# if (is_rev_strand(line)):
-#     print('reverse strand')
+prev_chrom=''
+
+while True:
+    '''reads through samfile and removes PCR duplicates'''
+    line=f.readline().strip().split('\t')
+
+    if line == ['']:
+        break
+    total_count+=1
+    
+    if args.umi != 'NULL':
+        if UMI(line) not in umi_dict: #make sure that the UMI is valid
+            bad_UMI_count+=1
+            prev_chrom=current_chrom
+            continue
+
+    current_chrom=chrom(line)
+    
+    umi=UMI(line)
+    position=adjusted_position(line)
+    strand=('rev' if is_rev_strand(line) else 'fwd')
+        
+    if current_chrom != prev_chrom: #since samfile is sorted we can clear the dictionary once we move onto the next chromosome, for memories sake.
+        current_dict.clear()
+    
+    if position in current_dict:
+
+        if (strand, umi) in current_dict[position]:
+            prev_chrom=current_chrom
+            duplicate_count+=1
+            continue
+        else:
+            current_dict[position]={}
+            current_dict[position][strand,umi]=''
+            print('\t'.join(line),file=w)
+        
+    else:
+        current_dict[position]={}
+        current_dict[position][strand,umi]=''
+        print('\t'.join(line),file=w)
+
+    prev_chrom=current_chrom
+    
+w.close()
 f.close()
 
-# print('UMI is {}'.format(UMI))
-# print('chrom is {}'.format(chrom))
-# print('ref position is {}'.format(ref))
-# print('cigar numbers are {}'.format(cigar_num))
-# print('cigar letters are {}'.format(cigar_letters))
+percent_bad=round((100*(bad_UMI_count+duplicate_count)/total_count), 2)
+print("The total number of reads is {}.".format(total_count))
+print("Removed all reads with UMIs not in provided UMI file, and removed all PCR duplicate reads")
+print("The total number of bad UMIs is {}.".format(bad_UMI_count))
+print("The total number of PCR duplicates is {}.".format(duplicate_count))
+print("The percentage of removed reads is {}%.".format(percent_bad))
