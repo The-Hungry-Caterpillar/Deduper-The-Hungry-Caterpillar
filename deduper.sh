@@ -15,7 +15,6 @@ help()
     echo " "
     echo "The following options are required:"
     echo "     -f     Input samfile name."
-    echo "     -o     Input desired deduped outfile name."
     echo " "
     echo "The following options are optional:"
     echo "     -s     Input any value if the input samfile is not already sorted. YOU MUST SORT THE SAMFILE IF NOT ALREADY SORTED!"
@@ -25,7 +24,7 @@ help()
 }
 
 # process input options
-while getopts ":hf:s:o:u:p:" option
+while getopts ":hf:s:u:p:" option
 do
     case $option in 
         
@@ -38,9 +37,6 @@ do
 
         s) #enter if samtools needs to sort or not
             sort=$OPTARG;;
-
-        o) #enter output file name
-            out=$OPTARG;;
 
         u) #enter UMI list
             umi=$OPTARG;;
@@ -61,11 +57,11 @@ if ! [ -f "$file" ]; then
     exit 1
 fi
 
-#check to make sure that an output filename was passed
-if [ -z "$out" ]; then
-    echo "Error: You must pass an output file name to the -o option; see -h for help"
-    exit 1
-fi
+# #check to make sure that an output filename was passed
+# if [ -z "$out" ]; then
+#     echo "Error: You must pass an output file name to the -o option; see -h for help"
+#     exit 1
+# fi
 
 if [ $paired ]; then
     echo "Sorry, we don't do paired end reads here."
@@ -80,7 +76,7 @@ if [ $sort ]; then
 fi
 
 if [ $umi ]; then
-    python dedup.py -f $file -o $out -u $umi
+    python ogata_deduper.py -f $file -u $umi
 else
-    python dedup.py -f $file -o $out -u "NULL"
+    python ogata_deduper.py -f $file -u "NULL"
 fi
