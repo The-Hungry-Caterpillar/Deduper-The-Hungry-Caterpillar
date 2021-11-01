@@ -1,4 +1,6 @@
 # Deduper
+### Note: script are currently configured for UO Talapas high performance computer
+
 This script takes samfiles generated from single-end experiements and removes PCR duplicates.
 
 We define PCR duplicates as reads which meet all of the following criteria:
