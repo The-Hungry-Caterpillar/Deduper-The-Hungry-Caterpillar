@@ -57,22 +57,21 @@ if ! [ -f "$file" ]; then
     exit 1
 fi
 
-# #check to make sure that an output filename was passed
-# if [ -z "$out" ]; then
-#     echo "Error: You must pass an output file name to the -o option; see -h for help"
-#     exit 1
-# fi
-
 if [ $paired ]; then
     echo "Sorry, we don't do paired end reads here."
 fi
 
+head -1000 sam.sam | grep '^@' > headers.txt
+
 if [ $sort ]; then
-    module load samtools/1.5
+    # module load samtools/1.5
+    conda activate dedup
     samtools view -S -b $file > inter.bam
     rm $file
     samtools sort inter.bam -o sorted.bam
+    rm inter.bam
     samtools view sorted.bam > $file
+    rm sorted.bam
 fi
 
 if [ $umi ]; then
@@ -80,3 +79,5 @@ if [ $umi ]; then
 else
     python ogata_deduper.py -f $file -u "NULL"
 fi
+
+rm headers.txt
