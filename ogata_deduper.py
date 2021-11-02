@@ -104,6 +104,16 @@ out=(args.file + '_deduped')
 print(out)
 f=open(args.file, 'r')
 w=open(out, 'w')
+headers=open("headers.txt",'r')
+
+while True:
+    '''writes the original headers into deduped samfile'''
+    line=headers.readline()
+    if line=='':
+        break
+    w.write(line)
+headers.close()
+
 
 umi_dict={}
 if args.umi != 'NULL':
@@ -120,7 +130,13 @@ prev_chrom=''
 
 while True:
     '''reads through samfile and removes PCR duplicates'''
-    line=f.readline().strip().split('\t')
+    line=f.readline()
+    
+    if line.startswith("@"):
+        '''Makes sure that the line isn't a sam header'''
+        continue
+    else:
+        line=line.strip().split('\t')
 
     if line == ['']:
         print("The number of unique reads in chromosome {} is {}.".format(prev_chrom,unique))
@@ -148,19 +164,15 @@ while True:
     if position in current_dict:
 
         if (strand, umi) in current_dict[position]:
-            # print('\t'.join(line))
             prev_chrom=current_chrom
             duplicate_count+=1
             continue
         else:
-            # print('\t'.join(line))
-            # current_dict[position]={}
             current_dict[position][strand,umi]=''
             unique+=1
             print('\t'.join(line),file=w)
         
     else:
-        # print('\t'.join(line))
         current_dict[position]={}
         current_dict[position][strand,umi]=''
         unique+=1
