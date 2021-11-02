@@ -31,10 +31,11 @@ The `deduper.sh` script will output:
     - The total number of reads discarded due to non-valid UMI
     - The total number of PCR duplicate reads discarded
     - The percentage of removed reads relative to the original sam file
+
 \
 \
 \
-example usage:
+### Example usage:
 
 `./deduper.sh -f sammy.sam -s y -u UMIs.txt`
 
