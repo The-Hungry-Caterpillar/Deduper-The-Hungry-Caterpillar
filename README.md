@@ -42,6 +42,6 @@ The `deduper.sh` script will output:
 
 ## Example usage:
 In your working directory: \
-```./deduper.sh -f sammy.sam -s y -u UMIs.txt```
+```./deduper.sh -f test.sam -s y -u UMIs.txt```
 
-This will first sort `sammy.sam` via [samtools](http://www.htslib.org/doc/samtools.html), and then remove PCR duplicates from `sammy.sam`, outputting the file `sammy.sam_deduped`; this out file will have all PCR duplicates reads and reads with UMIs not in `UMI.txt` removed.
+This will first sort `test.sam` via [samtools](http://www.htslib.org/doc/samtools.html), and then remove PCR duplicates from `test.sam`, outputting the file `test.sam_deduped`; this out file will have all PCR duplicates reads and reads with UMIs not in `UMI.txt` removed.
