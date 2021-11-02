@@ -11,6 +11,7 @@ We define PCR duplicates as reads which meet all of the following criteria:
 - Align to the same strand.
 - And have the same Unique Molecular Identifier (UMI).
 
+### Input
 To run the deduper script, use `./deduper.sh <options>`.
 The options are as follows:
 
