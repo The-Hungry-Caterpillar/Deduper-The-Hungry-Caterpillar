@@ -19,6 +19,17 @@ The options are as follows:
 - `-s` pass any text to this option if the input sam has not been aligned.
 - `-u` input UMI file. The UMI file must contain **only** UMI sequences separated by newlines. If passed then reads not containing an UMI specified in the UMI file will be discarded.
 - `-p` pass any text to this option if your samfile comes from paired end data. If you pass this option the script will happily tell you that it does not accept paired end data...yet.
+
+### Output
+The `deduper.sh` script will output:
+- A sam formated file with PCR duplicates removed called `<input file name_deduped>`.
+- A standard out text listing:
+    - The number of unique reads in each chromosome
+    - The total number of reads in original sam file
+    - The total number of reads in the deduped sam file
+    - The total number of reads discarded due to non-valid UMI
+    - The total number of PCR duplicate reads discarded
+    - The percentage of removed reads relative to the original sam file
 \
 \
 \
