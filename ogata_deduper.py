@@ -108,9 +108,11 @@ w=open(out, 'w')
 umi_dict={}
 if args.umi != 'NULL':
     UMI_builder(args.umi, umi_dict)
+
 bad_UMI_count=0
 duplicate_count=0
 total_count=0
+unique=0
 
 current_dict={}
 
@@ -121,7 +123,9 @@ while True:
     line=f.readline().strip().split('\t')
 
     if line == ['']:
+        print("The number of unique reads in chromosome {} is {}.".format(prev_chrom,unique))
         break
+    
     total_count+=1
     
     if args.umi != 'NULL':
@@ -137,22 +141,29 @@ while True:
     strand=('rev' if is_rev_strand(line) else 'fwd')
         
     if current_chrom != prev_chrom: #since samfile is sorted we can clear the dictionary once we move onto the next chromosome, for memories sake.
+        print("The number of unique reads in chromosome {} is {}.".format(prev_chrom,unique))
+        unique=0
         current_dict.clear()
-    
+
     if position in current_dict:
 
         if (strand, umi) in current_dict[position]:
+            # print('\t'.join(line))
             prev_chrom=current_chrom
             duplicate_count+=1
             continue
         else:
-            current_dict[position]={}
+            # print('\t'.join(line))
+            # current_dict[position]={}
             current_dict[position][strand,umi]=''
+            unique+=1
             print('\t'.join(line),file=w)
         
     else:
+        # print('\t'.join(line))
         current_dict[position]={}
         current_dict[position][strand,umi]=''
+        unique+=1
         print('\t'.join(line),file=w)
 
     prev_chrom=current_chrom
@@ -161,8 +172,10 @@ w.close()
 f.close()
 
 percent_bad=round((100*(bad_UMI_count+duplicate_count)/total_count), 2)
-print("The total number of reads is {}.".format(total_count))
+print("\n\n\n")
 print("Removed all reads with UMIs not in provided UMI file, and removed all PCR duplicate reads")
+print("The total number of reads in the original sam file is {}.".format(total_count))
+print("The total number of reads in the deduped sam file is {}.".format(total_count-bad_UMI_count-duplicate_count))
 print("The total number of bad UMIs is {}.".format(bad_UMI_count))
 print("The total number of PCR duplicates is {}.".format(duplicate_count))
 print("The percentage of removed reads is {}%.".format(percent_bad))
